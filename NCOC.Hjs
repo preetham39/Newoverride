@@ -1,0 +1,180 @@
+({
+    loadData : function(component) {
+        
+        var action = component.get("c.getContactDetails");
+        action.setCallback(this, function(response){
+            
+            console.log('Helper called',response.getReturnValue());
+            var result = response.getReturnValue() ;
+            component.set("v.titleCategoryValues", result.picklistValsMap['Title_Category__c']);
+            console.log('Title',component.get("v.titleCategoryValues"));
+            component.set("v.sourceValues", result.picklistValsMap['Source__c']);
+            console.log('Source',component.get("v.sourceValues"));
+            component.set("v.IdentifiableInformationSourceValues", result.picklistValsMap['IDable_Info_Source__c']);
+            console.log('IISource',component.get("v.IdentifiableInformationSourceValues"));
+            component.set("v.UndergradPostSecondaryDegreeValues", result.picklistValsMap['Deg_1_Type__c']);
+            console.log('UPSD',component.get("v.UndergradPostSecondaryDegreeValues"));
+            component.set("v.MastersProfessionalDegreeValues", result.picklistValsMap['Deg_2_Type__c']);
+            console.log('MPD',component.get("v.MastersProfessionalDegreeValues"));
+            component.set("v.AdvancedDoctoralDegreeValues", result.picklistValsMap['Deg_3_Type__c']);
+            console.log('ADD',component.get("v.AdvancedDoctoralDegreeValues"));
+            component.set("v.StartingStageValues", result.picklistValsMap['add_stage__c']);
+            console.log('SSV',component.get("v.StartingStageValues"));
+            component.set("v.EngagementSourceValues", result.picklistValsMap['add_source__c']);
+            console.log('ENGS',component.get("v.EngagementSourceValues"));
+        });
+        $A.enqueueAction(action);
+	},
+    validateFields: function(component,event){
+  var isValid = true;
+   // get lookup value 
+   /*var lVal = component.get("v.selectedLookUpRecord");  
+   if(lVal.Id == undefined){
+      isValid = false ;
+      alert('Please select the company feild it is required');*/
+     var lVal = component.get("v.selectedLookUpGeoRecord");
+     var lVal2 = component.get("v.selectedLookUpGeoRecord2");
+     var lVal3 = component.get("v.selectedLookUpGeoRecord3");
+        if(lVal.Id == undefined || lVal2.Id == undefined || lVal3.Id == Undefined ){
+           isValid = false;
+        alert('Please select atleast one of the geolocation value');
+    
+   }
+   return isValid;
+},
+    
+    saveProspects : function(component) {
+        
+        console.log('response1==>>',JSON.stringify(component.get("v.selectedLookUpRecord").Id));
+        console.log('response2==>>',JSON.stringify(component.get("v.selectedLookUpGeoRecord").Id));
+        console.log('response3==>>',JSON.stringify(component.get("v.selectedLookUpGeoRecord2").Id));
+        console.log('response4==>>',JSON.stringify(component.get("v.selectedLookUpGeoRecord3").Id));
+        console.log('response5==>>',JSON.stringify(component.get("v.selectedLookUpUserRecord").Id));
+        console.log('response6==>>',JSON.stringify(component.get("v.selectedLookUpUserRecord2").Id));
+        console.log('response7==>>',JSON.stringify(component.get("v.selectedLookUpSchoolRecord").Id));
+        console.log('response8==>>',JSON.stringify(component.get("v.selectedLookUpSchoolRecord2").Id));
+        console.log('response9==>>',JSON.stringify(component.get("v.selectedLookUpSchoolRecord3").Id));
+        console.log('response10==>>',JSON.stringify(component.get("v.selectedLookUpProjectRecord").Id));
+        console.log('response11==>>',JSON.stringify(component.get("v.selectedLookUpUserRecord3").Id));
+        console.log('response12==>>',JSON.stringify(component.get("v.selectedLookUpUserRecord4").Id));
+        console.log('response13==>>',JSON.stringify(component.get("v.selectedLookUpUserRecord5").Id));
+        
+        var cont = component.get("v.cnt");
+        
+        
+        var action = component.get("c.createProspectRecords");
+        action.setParams({
+            "objContact" : cont,
+            "accId" : component.get("v.selectedLookUpRecord").Id,
+            "metroId": component.get("v.selectedLookUpGeoRecord").Id,
+            "stateId": component.get("v.selectedLookUpGeoRecord2").Id,
+            "countryId": component.get("v.selectedLookUpGeoRecord3").Id,
+            "sourceId": component.get("v.selectedLookUpUserRecord").Id,
+            "recruiterId" : component.get("v.selectedLookUpUserRecord2").Id,
+            "undergradId" : component.get("v.selectedLookUpSchoolRecord").Id,
+            "MastersId" : component.get("v.selectedLookUpSchoolRecord2").Id,
+            "AdvancedId" : component.get("v.selectedLookUpSchoolRecord3").Id,
+            "addToPipelineId" : component.get("v.selectedLookUpProjectRecord").Id,
+            "EngagesrcId" : component.get("v.selectedLookUpUserRecord3").Id,
+            "EngagerctId" : component.get("v.selectedLookUpUserRecord4").Id,
+            "EngagercId" : component.get("v.selectedLookUpUserRecord5").Id,
+        });
+        action.setCallback(this, function(response){
+            
+                
+            console.log('Helper called',response.getReturnValue());
+            var result = response.getReturnValue() ;
+            console.log('result32=>>',result);
+            var state = response.getState();
+            if(state === 'SUCCESS'){
+                
+                var toastEvent = $A.get("e.force:showToast");
+                toastEvent.setParams({
+                    title : 'Success Message',
+                    message: "Prospects Created Successfully!!",
+                    duration:' 5000',
+                    key: 'info_alt',
+                    type: 'success',
+                    mode: 'pester'
+                });
+                toastEvent.fire();
+            }
+             
+            
+            var urlEvent = $A.get("e.force:navigateToURL");
+            urlEvent.setParams({
+                
+                "url": "/" + result.Id
+                         });
+            urlEvent.fire();
+            
+            
+            
+        });
+        $A.enqueueAction(action);
+    },
+    saveProspectsAndNew : function(component) {
+       
+        console.log('response1==>>',JSON.stringify(component.get("v.selectedLookUpRecord").Id));
+        console.log('response2==>>',JSON.stringify(component.get("v.selectedLookUpGeoRecord").Id));
+        console.log('response3==>>',JSON.stringify(component.get("v.selectedLookUpGeoRecord2").Id));
+        console.log('response4==>>',JSON.stringify(component.get("v.selectedLookUpGeoRecord3").Id));
+        console.log('response5==>>',JSON.stringify(component.get("v.selectedLookUpUserRecord").Id));
+        console.log('response6==>>',JSON.stringify(component.get("v.selectedLookUpUserRecord2").Id));
+        console.log('response7==>>',JSON.stringify(component.get("v.selectedLookUpSchoolRecord").Id));
+        console.log('response8==>>',JSON.stringify(component.get("v.selectedLookUpSchoolRecord2").Id));
+        console.log('response9==>>',JSON.stringify(component.get("v.selectedLookUpSchoolRecord3").Id));
+        console.log('response10==>>',JSON.stringify(component.get("v.selectedLookUpProjectRecord").Id));
+        console.log('response11==>>',JSON.stringify(component.get("v.selectedLookUpUserRecord3").Id));
+        console.log('response12==>>',JSON.stringify(component.get("v.selectedLookUpUserRecord4").Id));
+        console.log('response13==>>',JSON.stringify(component.get("v.selectedLookUpUserRecord5").Id));
+ 
+        
+        var cont = component.get("v.cnt");
+        console.log('saveProspectsAndNew called');
+        var action = component.get("c.createProspectRecords");
+        action.setParams({
+            "objContact" : cont,
+            "accId" : component.get("v.selectedLookUpRecord").Id,
+            "metroId": component.get("v.selectedLookUpGeoRecord").Id,
+            "stateId": component.get("v.selectedLookUpGeoRecord2").Id,
+            "countryId": component.get("v.selectedLookUpGeoRecord3").Id,
+            "sourceId": component.get("v.selectedLookUpUserRecord").Id,
+            "recruiterId" : component.get("v.selectedLookUpUserRecord2").Id,
+            "undergradId" : component.get("v.selectedLookUpSchoolRecord").Id,
+            "MastersId" : component.get("v.selectedLookUpSchoolRecord2").Id,
+            "AdvancedId" : component.get("v.selectedLookUpSchoolRecord3").Id,
+            "addToPipelineId" : component.get("v.selectedLookUpProjectRecord").Id,
+            "EngagesrcId" : component.get("v.selectedLookUpUserRecord3").Id,
+            "EngagerctId" : component.get("v.selectedLookUpUserRecord4").Id,
+            "EngagercId" : component.get("v.selectedLookUpUserRecord5").Id,
+        });
+        action.setCallback(this, function(response){
+            
+            console.log('Helper called',response.getReturnValue());
+            var result = response.getReturnValue() ;
+            console.log('result64=>>',result);
+            var state = response.getState();
+            if(state === 'SUCCESS'){
+                
+                var toastEvent = $A.get("e.force:showToast");
+                toastEvent.setParams({
+                    title : 'Success Message',
+                    message: "Prospects Created Successfully!!",
+                    duration:' 5000',
+                    key: 'info_alt',
+                    type: 'success',
+                    mode: 'pester'
+                });
+                toastEvent.fire();
+            }
+            
+            
+            
+            
+            
+        });
+        $A.enqueueAction(action);
+    }
+
+})
