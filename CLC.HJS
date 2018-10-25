@@ -1,0 +1,30 @@
+.THIS .slds-modal__container{
+  max-width: 60rem !important;
+    width:60% !important;
+}
+.THIS .clr{
+    color: red;
+}
+.THIS .ql-align-right {
+	text-align: right;
+}
+
+.THIS .slds-input-has-icon .slds-form-element__label{
+    display:none;
+}
+
+.THIS .cCustomLookup .algn{top:15px;}
+
+.THIS .slds-select_container:before {
+    border-bottom: 0px solid rgb(6, 28, 63);
+    top: calc((1.75rem / 2) - 6px);
+}
+.THIS .slds-select_container:before, .THIS .slds-select_container:after{top:15px;}
+.THIS .mFix{margin-top:44px;}
+.THIS legend{text-transform:uppercase; font-size:14px; font-weight:bold;}
+
+.THIS .slds-modal__content:last-child {
+    border-bottom-right-radius: .25rem;
+    border-bottom-left-radius: .25rem;
+    box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0);
+}
