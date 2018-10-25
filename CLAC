@@ -1,0 +1,86 @@
+public class customLookup {
+    @AuraEnabled
+    public static List < sObject > fetchLookUpValues(String searchKeyWord, String ObjectName) {
+        
+        system.debug('ObjectName-->' + ObjectName);
+        String searchKey = searchKeyWord + '%';
+        List < sObject > returnList = new List < sObject > (); 
+        String sQuery =  'select id, Name from ' +ObjectName + ' where Name LIKE: searchKey order by createdDate DESC LIMIT 20';
+        List < sObject > lstOfRecords = Database.query(sQuery);
+        
+        for (sObject obj: lstOfRecords) {
+            
+            returnList.add(obj);
+        }
+        return returnList;
+    }
+   
+    @AuraEnabled
+    public static Contact createProspectRecords(Contact  objContact,  Id accId, Id metroId,Id stateId, Id countryId, Id sourceId, Id recruiterId, Id undergradId,Id MastersId, Id AdvancedId, Id EngagercId, Id EngagesrcId, Id EngagerctId, Id addToPipelineId){
+        
+       // Id recordTypeId = Schema.SObjectType.Contact.getRecordTypeInfosByDeveloperName().get('External Prospect').getRecordTypeId();
+       // objContact.RecordTypeId = recordTypeId;
+        objContact.AccountId = accId;
+        objContact.metro__c = metroId;
+        objContact.state__c = stateId;
+        objContact.country__c = countryId;
+        objContact.Sourcer__c = sourceId;
+        objContact.Recruiter__c = recruiterId;
+        objContact.Deg_1_School__c = undergradId;
+        objContact.Deg_2_School__c = MastersId;
+        objContact.Deg_3_School__c = AdvancedId;
+        objContact.add_project__c = addToPipelineId;
+        objContact.add_rc__c = EngagercId;
+        objContact.add_sourcer__c = EngagesrcId;
+        objContact.add_recruiter__c = EngagerctId;
+        insert objContact;
+        return objContact;
+    }
+    @AuraEnabled 
+    public static wrapperObj getContactDetails(){
+        
+        map<string, list<string>> picklistsMap = new map<string, list<string>>();
+        
+        list<Contact> lstContacts = [SELECT Title_Category__c, Deg_3_Type__c, 
+                                     Source__c, IDable_Info_Source__c, Deg_2_Type__c, 
+                                     add_stage__c, add_source__c, Deg_1_Type__c  
+                                     FROM Contact LIMIT 49999];
+        
+        picklistsMap.put('Title_Category__c', getPicklistOptions('Title_Category__c'));
+        picklistsMap.put('Deg_3_Type__c', getPicklistOptions('Deg_3_Type__c'));
+        picklistsMap.put('Source__c', getPicklistOptions('Source__c'));
+        picklistsMap.put('IDable_Info_Source__c', getPicklistOptions('IDable_Info_Source__c'));
+        picklistsMap.put('Deg_2_Type__c', getPicklistOptions('Deg_2_Type__c'));
+        picklistsMap.put('add_stage__c', getPicklistOptions('add_stage__c'));
+        picklistsMap.put('add_source__c', getPicklistOptions('add_source__c'));
+        picklistsMap.put('Deg_1_Type__c', getPicklistOptions('Deg_1_Type__c'));
+        return new wrapperObj(lstContacts, picklistsMap);
+        
+    }
+    private static List<String> getPicklistOptions(String strFieldName) {
+        
+        List<String> lstPicklistOptions = new List<String>();
+        
+        for(Schema.PicklistEntry objPicklistOption : Contact.sObjectType.getDescribe().Fields.getmap().get(strFieldName).getDescribe().getPicklistValues()) {
+            
+            if(objPicklistOption.isActive()){
+                
+                lstPicklistOptions.add(objPicklistOption.getValue());
+            }
+            
+        }
+        return lstPicklistOptions; 
+    }
+    
+    public class wrapperObj{
+        @AuraEnabled
+        public map<string, list<string>> picklistValsMap {get; set;}
+        @AuraEnabled
+        public list<Contact> lstContacts {get; set;}
+        public wrapperObj(list<Contact> lstContacts, Map<String, list<string>> picklistValsMap ){
+            this.lstContacts = lstContacts;
+            this.picklistValsMap = picklistValsMap;
+        }
+        
+    }
+}
