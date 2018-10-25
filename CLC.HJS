@@ -1,30 +1,31 @@
-.THIS .slds-modal__container{
-  max-width: 60rem !important;
-    width:60% !important;
-}
-.THIS .clr{
-    color: red;
-}
-.THIS .ql-align-right {
-	text-align: right;
-}
-
-.THIS .slds-input-has-icon .slds-form-element__label{
-    display:none;
-}
-
-.THIS .cCustomLookup .algn{top:15px;}
-
-.THIS .slds-select_container:before {
-    border-bottom: 0px solid rgb(6, 28, 63);
-    top: calc((1.75rem / 2) - 6px);
-}
-.THIS .slds-select_container:before, .THIS .slds-select_container:after{top:15px;}
-.THIS .mFix{margin-top:44px;}
-.THIS legend{text-transform:uppercase; font-size:14px; font-weight:bold;}
-
-.THIS .slds-modal__content:last-child {
-    border-bottom-right-radius: .25rem;
-    border-bottom-left-radius: .25rem;
-    box-shadow: 0 2px 3px 0 rgba(0, 0, 0, 0);
-}
+({
+	searchHelper : function(component,event,getInputkeyWord) {
+	  // call the apex class method 
+     var action = component.get("c.fetchLookUpValues");
+      // set param to method  
+        action.setParams({
+            'searchKeyWord': getInputkeyWord,
+            'ObjectName' : component.get("v.objectAPIName")
+          });
+      // set a callBack    
+        action.setCallback(this, function(response) {
+          $A.util.removeClass(component.find("mySpinner"), "slds-show");
+            var state = response.getState();
+            if (state === "SUCCESS") {
+                var storeResponse = response.getReturnValue();
+              // if storeResponse size is equal 0 ,display No Result Found... message on screen.                }
+                if (storeResponse.length == 0) {
+                    component.set("v.Message", 'No Result Found...');
+                } else {
+                    component.set("v.Message", '');
+                }
+                // set searchResult list with return value from server.
+                component.set("v.listOfSearchRecords", storeResponse);
+            }
+ 
+        });
+      // enqueue the Action  
+        $A.enqueueAction(action);
+    
+	},
+})
